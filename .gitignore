@@ -1,0 +1,11 @@
+
+# experiment dirs
+outputs/
+
+# C extensions
+*.so
+
+# vscode
+.vscode/
+
+.cache

@@ -57,3 +57,15 @@ int main()
     std::cout << x << std::endl;
 } 
 ```
+
+6. placement delete
+    1. 只销毁不回收，销毁的空间之后可以给placement new用。
+
+
+## 智能指针
+### shared_ptr
+1. 基本用法
+2. reset / get 方法
+3. 指定内存回收逻辑
+4. std::make_shared
+5. 支持数组 (C++17 shared_ptr<T[]>; c++20 支持 make_shared 分配内存)

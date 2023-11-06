@@ -69,3 +69,21 @@ int main()
 3. 指定内存回收逻辑
 4. std::make_shared
 5. 支持数组 (C++17 shared_ptr<T[]>; c++20 支持 make_shared 分配内存)
+
+### unique_ptr
+1. 基本用法
+2. unique_ptr 不支持复制，但可以移动
+3. 为 unique_ptr 指定内存回收逻辑
+
+### weak_ptr
+1. 基于 shared_ptr 构造
+2. lock 方法
+
+
+## 动态内存相关问题
+1. sizeof 不会返回动态分配的内存大小
+2. 使用分配器（allocator）来分配内存
+3. 使用 malloc/free 来管理内存
+4. 使用 aligned_alloc 来分配对齐内存
+5. 动态内存与异常安全
+6. C++对于垃圾回收的支持

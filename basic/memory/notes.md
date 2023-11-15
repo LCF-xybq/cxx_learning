@@ -66,8 +66,108 @@ int main()
 ### shared_ptr
 1. 基本用法
 2. reset / get 方法
+    ```cxx
+    struct Foo {
+        Foo(int n = 0) noexcept : bar(n) {
+            std::cout << "Foo: constructor, bar = " << bar << '\n';
+        }
+        ~Foo() {
+            std::cout << "Foo: destructor, bar = " << bar << '\n';
+        }
+        int getBar() const noexcept { return bar; }
+    private:
+        int bar;
+    };
+    
+    int main()
+    {
+        std::shared_ptr<Foo> sptr = std::make_shared<Foo>(1);
+        std::cout << "The first Foo's bar is " << sptr->getBar() << "\n";
+    
+        // 重置，交与新的 Foo 实例
+        // （此调用后将销毁旧实例）
+        sptr.reset(new Foo);
+        std::cout << "The second Foo's bar is " << sptr->getBar() << "\n";
+        /*
+        Foo: constructor, bar = 1
+        The first Foo's bar is 1
+        Foo: constructor, bar = 0
+        Foo: destructor, bar = 1
+        The second Foo's bar is 0
+        Foo: destructor, bar = 0
+        */
+    }
+    ```
+    get(): 返回存储的指针
+    ```cxx
+    #include <iostream>
+    #include <memory>
+    #include <string_view> // c++17
+    
+    void output(std::string_view msg, int const* pInt)
+    {
+        std::cout << msg << *pInt << "\n";
+    }
+    
+    int main()
+    {
+        int* pInt = new int(42);
+        std::shared_ptr<int> pShared = std::make_shared<int>(42);
+    
+        output("Naked pointer ", pInt);
+        // output("Shared pointer ", pShared); // 编译错误
+        output("Shared pointer with get() ", pShared.get());
+    
+        delete pInt;
+
+        /*
+        Naked pointer 42
+        Shared pointer with get() 42
+        */
+    }
+    ```
 3. 指定内存回收逻辑
+    ```cxx
+    void diy_del(int* ptr)
+    {
+        std::cout << "Call deleter fun\n";
+        delete ptr;
+    }
+
+    int main()
+    {
+        // Call deleter fun
+        std::shared_ptr<int> x(new int(2), diy_del);
+    }
+
+    /*
+    针对静态变量的指针的析构，不应该使用delete来销毁内存，因为静态变量的内存应该是整个程序结束之后自动释放的。所以此时可以使用重定义deletor来避免默认的delete释放内存。
+    */
+    void diy_del(int* ptr)
+    {
+        std::cout << "Call deleter fun\n";
+        delete ptr;
+    }
+
+    void dummy(int* ptr) {}
+
+    std::shared_ptr<int> fun3()
+    {
+        static int res = 2;
+        return std::shared_ptr<int>(&res, dummy);
+    }
+
+    int main()
+    {
+        {
+            std::shared_ptr<int> x = fun3();
+        }
+    }
+    ```
 4. std::make_shared
+    
+    shared_ptr的构造函数会申请两次内存，而make_ptr会申请一次内存。一方面效率提交了，一方面保证了异常安全
+
 5. 支持数组 (C++17 shared_ptr<T[]>; c++20 支持 make_shared 分配内存)
 
 ### unique_ptr
